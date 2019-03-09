@@ -47,3 +47,5 @@ const server = http.createServer((request, response) => {
 });
 
 server.listen(PORT, "localhost", console.log(`Server starts at port: ${PORT}`));
+
+process.on("uncaughtException", err => { console.error(err.message); });
