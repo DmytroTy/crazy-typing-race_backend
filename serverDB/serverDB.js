@@ -112,7 +112,7 @@ const server = http.createServer((request, response) => {
             } catch (err) {
                 console.error(err.message);
             }
-            if (user !== undefined) {
+            if (user !== undefined && user.login !== undefined) {
                 const str = fs.readFileSync("users.json", "utf8");
                 const users = JSON.parse(str);
                 if (Object.keys(users).every(key => key !== user.login)) {
