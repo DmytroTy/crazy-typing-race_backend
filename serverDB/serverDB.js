@@ -48,6 +48,7 @@ const server = http.createServer((request, response) => {
         }
     } else if (request.method === "POST" && request.url.startsWith("/db/add/text")) {
         if (request.headers["Content-Type"] !== "application/json") {
+            request.resume();
             response.statusCode = 404;
             response.setHeader("Content-Type", "text/plain");
             response.end(`404 Incorrect data recived`);
@@ -98,6 +99,7 @@ const server = http.createServer((request, response) => {
         }
     } else if (request.method === "POST" && request.url.startsWith("/db/add/user")) {
         if (request.headers["Content-Type"] !== "application/json") {
+            request.resume();
             response.statusCode = 404;
             response.setHeader("Content-Type", "text/plain");
             response.end(`404 Incorrect data recived`);
