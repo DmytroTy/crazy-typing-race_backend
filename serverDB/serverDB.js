@@ -63,10 +63,10 @@ const server = http.createServer((request, response) => {
             } catch (err) {
                 console.error(err.message);
             }
-            if (text !== undefined && text[category] !== undefined && text[theme] !== undefined && text[body] !== undefined) {
+            if (text !== undefined && text.category !== undefined && text.theme !== undefined && text.body !== undefined) {
                 const str = fs.readFileSync("texts.json", "utf8");
                 const texts = JSON.parse(str);
-                texts[category][theme].push(text[body]);
+                texts[text.category][text.theme].push(text.body);
                 fs.writeFileSync("texts.json", JSON.stringify(texts));
                 response.statusCode = 200;
                 response.setHeader("Content-Type", "text/plain");
