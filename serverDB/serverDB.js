@@ -66,6 +66,12 @@ const server = http.createServer((request, response) => {
             if (text !== undefined && text.category !== undefined && text.theme !== undefined && text.body !== undefined) {
                 const str = fs.readFileSync("texts.json", "utf8");
                 const texts = JSON.parse(str);
+                if (typeof texts[text.category] !== "object") 
+                    texts[text.category] = {};
+
+                if (typeof texts[text.category][text.theme] !== "array") 
+                    texts[text.category][text.theme] = [];
+                    
                 texts[text.category][text.theme].push(text.body);
                 fs.writeFileSync("texts.json", JSON.stringify(texts));
                 response.statusCode = 200;
