@@ -47,11 +47,11 @@ const server = http.createServer((request, response) => {
             response.end(`404 Incorrect parameters`);
         }
     } else if (request.method === "POST" && request.url.startsWith("/db/add/text")) {
-        if (request.headers["Content-Type"] !== "application/json") {
+        if (request.headers["content-type"] !== "application/json") {
             request.resume();
             response.statusCode = 404;
             response.setHeader("Content-Type", "text/plain");
-            response.end(`404 Incorrect data recived`);
+            response.end(`Expected application/json but received ${request.headers["Content-Type"]}`);
         }
         request.setEncoding("utf8");
         let data = "";
@@ -69,11 +69,11 @@ const server = http.createServer((request, response) => {
                 if (typeof texts[text.category] !== "object") 
                     texts[text.category] = {};
 
-                if (typeof texts[text.category][text.theme] !== "array") 
+                if (typeof texts[text.category][text.theme] !== "object") 
                     texts[text.category][text.theme] = [];
-                    
+
                 texts[text.category][text.theme].push(text.body);
-                fs.writeFileSync("texts.json", JSON.stringify(texts));
+                fs.writeFileSync("texts.json", JSON.stringify(texts, null, 1));
                 response.statusCode = 200;
                 response.setHeader("Content-Type", "text/plain");
                 response.end("OK");
@@ -104,11 +104,11 @@ const server = http.createServer((request, response) => {
             response.end(`404 Incorrect parameters`);
         }
     } else if (request.method === "POST" && request.url.startsWith("/db/add/user")) {
-        if (request.headers["Content-Type"] !== "application/json") {
+        if (request.headers["content-type"] !== "application/json") {
             request.resume();
             response.statusCode = 404;
             response.setHeader("Content-Type", "text/plain");
-            response.end(`404 Incorrect data recived`);
+            response.end(`Expected application/json but received ${request.headers["Content-Type"]}`);
         }
         request.setEncoding("utf8");
         let data = "";
@@ -125,7 +125,7 @@ const server = http.createServer((request, response) => {
                 const users = JSON.parse(str);
                 if (Object.keys(users).every(key => key !== user.login)) {
                     users[user.login] = user;
-                    fs.writeFileSync("users.json", JSON.stringify(users));
+                    fs.writeFileSync("users.json", JSON.stringify(users, null, 1));
                     response.statusCode = 200;
                     response.setHeader("Content-Type", "text/plain");
                     response.end("OK");
