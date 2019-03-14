@@ -47,11 +47,12 @@ const server = http.createServer((request, response) => {
             response.end(`404 Incorrect parameters`);
         }
     } else if (request.method === "POST" && request.url.startsWith("/db/add/text")) {
-        if (request.headers["content-type"] !== "application/json") {
+        if ((request.headers["Content-Type"] || request.headers["content-type"]) !== "application/json") {
             request.resume();
-            response.statusCode = 404;
+            response.statusCode = 415;
             response.setHeader("Content-Type", "text/plain");
             response.end(`Expected application/json but received ${request.headers["Content-Type"]}`);
+            return;
         }
         request.setEncoding("utf8");
         let data = "";
@@ -104,11 +105,12 @@ const server = http.createServer((request, response) => {
             response.end(`404 Incorrect parameters`);
         }
     } else if (request.method === "POST" && request.url.startsWith("/db/add/user")) {
-        if (request.headers["content-type"] !== "application/json") {
+        if ((request.headers["Content-Type"] || request.headers["content-type"]) !== "application/json") {
             request.resume();
-            response.statusCode = 404;
+            response.statusCode = 415;
             response.setHeader("Content-Type", "text/plain");
             response.end(`Expected application/json but received ${request.headers["Content-Type"]}`);
+            return;
         }
         request.setEncoding("utf8");
         let data = "";
