@@ -51,7 +51,7 @@ const server = http.createServer((request, response) => {
             request.resume();
             response.statusCode = 415;
             response.setHeader("Content-Type", "text/plain");
-            response.end(`Expected application/json but received ${request.headers["Content-Type"]}`);
+            response.end(`Expected application/json but received ${request.headers["Content-Type"]} -- ${request.headers["content-type"]}`);
             return;
         }
         request.setEncoding("utf8");
@@ -109,7 +109,7 @@ const server = http.createServer((request, response) => {
             request.resume();
             response.statusCode = 415;
             response.setHeader("Content-Type", "text/plain");
-            response.end(`Expected application/json but received ${request.headers["Content-Type"]}`);
+            response.end(`Expected application/json but received ${request.headers["Content-Type"]} -- ${request.headers["content-type"]}`);
             return;
         }
         request.setEncoding("utf8");
