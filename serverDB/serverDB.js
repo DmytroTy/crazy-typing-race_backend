@@ -12,6 +12,11 @@ const server = http.createServer((request, response) => {
     response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
     response.setHeader("Access-Control-Max-Age", 86400);
+    if (request.method === "OPTIONS") {
+        response.statusCode = 200;
+        response.setHeader("Content-Type", "text/plain");
+        response.setHeader("Content-Lengt", 0);
+    };
     if (request.method === "GET" && request.url.startsWith("/db/themes")) {
         response.statusCode = 200;
         response.setHeader("Content-Type", "application/json");
