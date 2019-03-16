@@ -6,6 +6,8 @@ const PORT = process.env.PORT || 3000;
 
 const server = http.createServer((request, response) => {
     const myURL = url.parse(request.url, true);
+    console.log(`request.method: ${request.method}`);
+    console.log(`request.headers: ${request.headers}`);
     if (request.method === "GET" && request.url.startsWith("/db/themes")) {
         response.statusCode = 200;
         response.setHeader("Content-Type", "application/json");
