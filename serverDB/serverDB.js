@@ -17,8 +17,7 @@ const server = http.createServer((request, response) => {
         response.setHeader("Content-Type", "text/plain");
         response.setHeader("Content-Length", 0);
         response.end();
-    };
-    if (request.method === "GET" && request.url.startsWith("/db/themes")) {
+    } else if (request.method === "GET" && request.url.startsWith("/db/themes")) {
         response.statusCode = 200;
         response.setHeader("Content-Type", "application/json");
         const str = fs.readFileSync("texts.json", "utf8");
