@@ -11,7 +11,7 @@ const server = http.createServer((request, response) => {
     console.log(`request.headers.origin: ${request.headers["origin"]}`);
     response.setHeader("Access-Control-Allow-Origin", request.headers["origin"]);
     response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    response.setHeader("Access-Control-Allow-Headers", "content-type");
     response.setHeader("Access-Control-Max-Age", 86400);
     if (request.method === "OPTIONS") {
         response.statusCode = 200;
@@ -65,7 +65,7 @@ const server = http.createServer((request, response) => {
             request.resume();
             response.statusCode = 415;
             response.setHeader("Content-Type", "text/plain");
-            response.end(`Expected application/json but received ${request.headers["Content-Type"]} -- ${request.headers["content-type"]}`);
+            response.end(`Expected application/json but received ${request.headers["content-type"]}`);
             return;
         }
         request.setEncoding("utf8");
@@ -124,7 +124,7 @@ const server = http.createServer((request, response) => {
             request.resume();
             response.statusCode = 415;
             response.setHeader("Content-Type", "text/plain");
-            response.end(`Expected application/json but received ${request.headers["Content-Type"]} -- ${request.headers["content-type"]}`);
+            response.end(`Expected application/json but received ${request.headers["content-type"]}`);
             return;
         }
         request.setEncoding("utf8");
