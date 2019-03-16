@@ -15,7 +15,7 @@ const server = http.createServer((request, response) => {
     if (request.method === "OPTIONS") {
         response.statusCode = 200;
         response.setHeader("Content-Type", "text/plain");
-        response.setHeader("Content-Lengt", 0);
+        response.setHeader("Content-Length", 0);
         response.end();
     };
     if (request.method === "GET" && request.url.startsWith("/db/themes")) {
@@ -28,6 +28,7 @@ const server = http.createServer((request, response) => {
             themes[key] = Object.keys(texts[key]);
         });
         const result = JSON.stringify(themes);
+        response.setHeader("Content-Length", Buffer.byteLength(result));
         response.end(result);
     } else if (request.method === "GET" && request.url.startsWith("/db/text")) {
         if (myURL.query.category !== undefined && myURL.query.theme !== undefined) {
@@ -42,6 +43,7 @@ const server = http.createServer((request, response) => {
                     const text = JSON.stringify(texts[category][theme][index]);
                     response.statusCode = 200;
                     response.setHeader("Content-Type", "application/json");
+                    response.setHeader("Content-Length", Buffer.byteLength(text));
                     response.end(text);
                 } else {
                     response.statusCode = 404;
@@ -105,6 +107,7 @@ const server = http.createServer((request, response) => {
                 const user = JSON.stringify(users.login);
                 response.statusCode = 200;
                 response.setHeader("Content-Type", "application/json");
+                response.setHeader("Content-Length", Buffer.byteLength(user));
                 response.end(user);
             } else {
                 response.statusCode = 404;
@@ -163,4 +166,4 @@ const server = http.createServer((request, response) => {
 
 server.listen(PORT, "localhost", console.log(`Server starts at port: ${PORT}`));
 
-process.on("uncaughtException", err => { console.error(err.message); });
+process.on("uncaughtException", err => { console.error(err); });
