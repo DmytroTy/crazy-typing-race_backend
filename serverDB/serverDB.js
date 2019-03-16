@@ -8,6 +8,10 @@ const server = http.createServer((request, response) => {
     const myURL = url.parse(request.url, true);
     console.log(`request.method: ${request.method}`);
     console.log(`request.headers: ${request.headers}`);
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    response.setHeader("Access-Control-Max-Age", 86400);
     if (request.method === "GET" && request.url.startsWith("/db/themes")) {
         response.statusCode = 200;
         response.setHeader("Content-Type", "application/json");
