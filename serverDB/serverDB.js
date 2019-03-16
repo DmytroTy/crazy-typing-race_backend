@@ -7,8 +7,9 @@ const PORT = process.env.PORT || 3000;
 const server = http.createServer((request, response) => {
     const myURL = url.parse(request.url, true);
     console.log(`request.method: ${request.method}`);
-    console.log(`request.headers: ${request.headers["Content-Type"]}`);
-    response.setHeader("Access-Control-Allow-Origin", request.headers["Origin"]);
+    console.log(`request.headers: ${request.headers["content-type"]}`);
+    console.log(`request.headers.origin: ${request.headers["origin"]}`);
+    response.setHeader("Access-Control-Allow-Origin", request.headers["origin"]);
     response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
     response.setHeader("Access-Control-Max-Age", 86400);
