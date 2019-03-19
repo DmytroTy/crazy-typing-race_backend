@@ -9,6 +9,7 @@ const server = http.createServer((request, response) => {
     console.log(`request.method: ${request.method}`);
     console.log(`request.headers: ${request.headers["content-type"]} -- ${request.headers["Content-Type"]}`);
     console.log(`request.headers.origin: ${request.headers["origin"]}`);
+    response.setHeader("Content-Type", "text/plain");
     response.setHeader("Access-Control-Allow-Origin", request.headers["origin"] || "*");
     response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     response.setHeader("Access-Control-Allow-Headers", "content-type");
@@ -19,7 +20,6 @@ const server = http.createServer((request, response) => {
     response.setHeader("Connection", "Keep-Alive");
     if (request.method === "OPTIONS") {
         response.statusCode = 200;
-        response.setHeader("Content-Type", "text/plain");
         response.setHeader("Content-Length", 0);
         response.end();
     } else if (request.method === "GET" && request.url.startsWith("/db/themes")) {
@@ -51,24 +51,20 @@ const server = http.createServer((request, response) => {
                     response.end(text);
                 } else {
                     response.statusCode = 404;
-                    response.setHeader("Content-Type", "text/plain");
                     response.end(`404 Text with theme: ${theme} not found!`);
                 }
             } else {
                 response.statusCode = 404;
-                response.setHeader("Content-Type", "text/plain");
                 response.end(`404 Text with category: ${category} not found!`);
             }
         } else {
-            response.statusCode = 404;
-            response.setHeader("Content-Type", "text/plain");
-            response.end(`404 Incorrect parameters`);
+            response.statusCode = 406;
+            response.end(`406 Incorrect parameters`);
         }
     } else if (request.method === "POST" && request.url.startsWith("/db/add/text")) {
         if ((request.headers["Content-Type"] || request.headers["content-type"]) !== "application/json") {
             request.resume();
             response.statusCode = 415;
-            response.setHeader("Content-Type", "text/plain");
             response.end(`Expected application/json but received ${request.headers["content-type"]}`);
             return;
         }
@@ -91,15 +87,18 @@ const server = http.createServer((request, response) => {
                 if (typeof texts[text.category][text.theme] !== "object") 
                     texts[text.category][text.theme] = [];
 
-                texts[text.category][text.theme].push(text.body);
-                fs.writeFileSync("texts.json", JSON.stringify(texts, null, 1));
-                response.statusCode = 200;
-                response.setHeader("Content-Type", "text/plain");
-                response.end();
+                if (texts[text.category][text.theme].every(str => str !== text.body)) {
+                    texts[text.category][text.theme].push(text.body);
+                    fs.writeFileSync("texts.json", JSON.stringify(texts, null, 1));
+                    response.statusCode = 204;
+                    response.end();
+                } else {
+                    response.statusCode = 409;
+                    response.end(`409 This text alredy exist in: ${text.category}: ${text.theme}!`);
+                }
             } else {
-                response.statusCode = 404;
-                response.setHeader("Content-Type", "text/plain");
-                response.end(`404 Incorrect data recived`);
+                response.statusCode = 406;
+                response.end(`406 Incorrect data recived`);
             }
         });
     } else if (request.method === "GET" && request.url.startsWith("/db/user")) {
@@ -115,19 +114,16 @@ const server = http.createServer((request, response) => {
                 response.end(user);
             } else {
                 response.statusCode = 404;
-                response.setHeader("Content-Type", "text/plain");
                 response.end(`404 User with login: ${myURL.query.login} not found!`);
             }
         } else {
-            response.statusCode = 404;
-            response.setHeader("Content-Type", "text/plain");
-            response.end(`404 Incorrect parameters`);
+            response.statusCode = 406;
+            response.end(`406 Incorrect parameters`);
         }
     } else if (request.method === "POST" && request.url.startsWith("/db/add/user")) {
         if ((request.headers["Content-Type"] || request.headers["content-type"]) !== "application/json") {
             request.resume();
             response.statusCode = 415;
-            response.setHeader("Content-Type", "text/plain");
             response.end(`Expected application/json but received ${request.headers["content-type"]}`);
             return;
         }
@@ -147,23 +143,19 @@ const server = http.createServer((request, response) => {
                 if (Object.keys(users).every(key => key !== user.login)) {
                     users[user.login] = user;
                     fs.writeFileSync("users.json", JSON.stringify(users, null, 1));
-                    response.statusCode = 200;
-                    response.setHeader("Content-Type", "text/plain");
+                    response.statusCode = 204;
                     response.end();
                 } else {
-                    response.statusCode = 404;
-                    response.setHeader("Content-Type", "text/plain");
-                    response.end(`404 User with login: ${user.login} alredy exist!`);
+                    response.statusCode = 409;
+                    response.end(`409 User with login: ${user.login} alredy exist!`);
                 }
             } else {
-                response.statusCode = 404;
-                response.setHeader("Content-Type", "text/plain");
-                response.end(`404 Incorrect data recived`);
+                response.statusCode = 406;
+                response.end(`406 Incorrect data recived`);
             }
         });
     } else {
         response.statusCode = 404;
-        response.setHeader("Content-Type", "text/plain");
         response.end("404 Resourse not found!");
     }
 });
