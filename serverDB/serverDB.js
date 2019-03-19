@@ -95,7 +95,7 @@ const server = http.createServer((request, response) => {
                 fs.writeFileSync("texts.json", JSON.stringify(texts, null, 1));
                 response.statusCode = 200;
                 response.setHeader("Content-Type", "text/plain");
-                response.end("OK");
+                response.end();
             } else {
                 response.statusCode = 404;
                 response.setHeader("Content-Type", "text/plain");
@@ -149,7 +149,7 @@ const server = http.createServer((request, response) => {
                     fs.writeFileSync("users.json", JSON.stringify(users, null, 1));
                     response.statusCode = 200;
                     response.setHeader("Content-Type", "text/plain");
-                    response.end("OK");
+                    response.end();
                 } else {
                     response.statusCode = 404;
                     response.setHeader("Content-Type", "text/plain");
