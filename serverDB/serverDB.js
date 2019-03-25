@@ -5,9 +5,9 @@ const fs = require("fs");
 const PORT = process.env.PORT || 3000;
 
 const server = http.createServer((request, response) => {
-    const myURL = url.parse(request.url, true);
+    const myURL = url.parse(request.url, true); // new URL(request.url, host?);
     console.log(`request.method: ${request.method}`);
-    console.log(`request.headers: ${request.headers["content-type"]} -- ${request.headers["Content-Type"]}`);
+    console.log(`request.headers.content-type: ${request.headers["content-type"]}`);
     console.log(`request.headers.origin: ${request.headers["origin"]}`);
     response.setHeader("Content-Type", "text/plain");
     response.setHeader("Access-Control-Allow-Origin", request.headers["origin"] || "*");
@@ -62,7 +62,7 @@ const server = http.createServer((request, response) => {
             response.end(`406 Incorrect parameters`);
         }
     } else if (request.method === "POST" && request.url.startsWith("/db/add/text")) {
-        if ((request.headers["Content-Type"] || request.headers["content-type"]) !== "application/json") {
+        if (request.headers["content-type"] !== "application/json") {
             request.resume();
             response.statusCode = 415;
             response.end(`Expected application/json but received ${request.headers["content-type"]}`);
@@ -121,7 +121,7 @@ const server = http.createServer((request, response) => {
             response.end(`406 Incorrect parameters`);
         }
     } else if (request.method === "POST" && request.url.startsWith("/db/add/user")) {
-        if ((request.headers["Content-Type"] || request.headers["content-type"]) !== "application/json") {
+        if (request.headers["content-type"] !== "application/json") {
             request.resume();
             response.statusCode = 415;
             response.end(`Expected application/json but received ${request.headers["content-type"]}`);
