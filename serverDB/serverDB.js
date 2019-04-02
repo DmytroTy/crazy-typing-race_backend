@@ -11,14 +11,14 @@ const server = http.createServer((request, response) => {
     console.log(`request.headers.origin: ${request.headers["origin"]}`);
     response.setHeader("Content-Type", "text/plain");
     response.setHeader("Access-Control-Allow-Origin", request.headers["origin"] || "*");
-    response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    response.setHeader("Access-Control-Allow-Headers", "content-type");
-    response.setHeader("Access-Control-Max-Age", 86400);
     response.setHeader("Vary", "*");
     response.setHeader("Cache-Control", "no-store");
     response.setHeader("Keep-Alive", "timeout=2, max=99");
     response.setHeader("Connection", "Keep-Alive");
     if (request.method === "OPTIONS") {
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        response.setHeader("Access-Control-Max-Age", 86400);
         response.statusCode = 200;
         response.setHeader("Content-Length", 0);
         response.end();
