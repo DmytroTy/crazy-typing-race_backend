@@ -1,6 +1,7 @@
 const http = require("http");
 const url = require("url");
 const fs = require("fs");
+const db = require("./db");
 
 const PORT = process.env.PORT || 3000;
 
@@ -25,6 +26,10 @@ const server = http.createServer((request, response) => {
     } else if (request.method === "GET" && request.url.startsWith("/db/themes")) {
         response.statusCode = 200;
         response.setHeader("Content-Type", "application/json");
+        db.query("SELECT", (err, result) => {
+            if (err) return console.error('Error executing query', err);
+            // result.rows
+        });
         const str = fs.readFileSync("texts.json", "utf8");
         const texts = JSON.parse(str);
         const themes = {};
