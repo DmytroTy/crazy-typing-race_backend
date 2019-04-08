@@ -1,0 +1,23 @@
+{
+  "name": "crazy-typing-race_backend",
+  "version": "1.0.0",
+  "description": "Crazy Typing Race",
+  "main": "index.js",
+  "dependencies": {
+    "pg": "^7.9.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DmytroTy/crazy-typing-race_backend.git"
+  },
+  "author": "Dmytro",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DmytroTy/crazy-typing-race_backend/issues"
+  },
+  "homepage": "https://github.com/DmytroTy/crazy-typing-race_backend#readme"
+}
