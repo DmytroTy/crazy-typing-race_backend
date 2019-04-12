@@ -61,7 +61,7 @@ const server = http.createServer((request, response) => {
         response.setHeader("Content-Type", "application/json");
         response.setHeader("Content-Length", Buffer.byteLength(text));
         response.end(text);
-    } else if (request.method === "POST" && request.url.startsWith("/db/add/text")) {
+    } else if (request.method === "POST" && request.url.startsWith("/db/text")) {
         if (request.headers["content-type"] !== "application/json") {
             request.resume();
             response.statusCode = 415;
@@ -120,7 +120,7 @@ const server = http.createServer((request, response) => {
         response.setHeader("Content-Type", "application/json");
         response.setHeader("Content-Length", Buffer.byteLength(user));
         response.end(user);
-    } else if (request.method === "POST" && request.url.startsWith("/db/add/user")) {
+    } else if (request.method === "POST" && request.url.startsWith("/db/user")) {
         if (request.headers["content-type"] !== "application/json") {
             request.resume();
             response.statusCode = 415;
