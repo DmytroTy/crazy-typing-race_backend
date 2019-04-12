@@ -23,23 +23,51 @@ const server = http.createServer((request, response) => {
         response.statusCode = 200;
         response.setHeader("Content-Length", 0);
         response.end();
-    } else if (request.method === "GET" && request.url.startsWith("/db/themes")) {
-        response.statusCode = 200;
-        response.setHeader("Content-Type", "application/json");
-        db.query("SELECT", (err, result) => {
-            if (err) return console.error('Error executing query', err);
-            // result.rows
-        });
-        const str = fs.readFileSync("texts.json", "utf8");
-        const texts = JSON.parse(str);
-        const themes = {};
-        Object.keys(texts).forEach(key => {
-            themes[key] = Object.keys(texts[key]);
-        });
-        const result = JSON.stringify(themes);
-        response.setHeader("Content-Length", Buffer.byteLength(result));
-        response.end(result);
-    } else if (request.method === "GET" && request.url.startsWith("/db/text")) {
+        return;
+    };
+    if (request.method === "GET" && request.url.startsWith("/db/categories")) {
+        db.query("SELECT title FROM Categories;")
+            .then((result) => {
+                response.statusCode = 200;
+                response.setHeader("Content-Type", "application/json");
+                const categories = JSON.stringify(result.rows);
+                response.setHeader("Content-Length", Buffer.byteLength(categories));
+                response.end(categories);
+            }).catch((err) => {
+                console.error('Error executing query', err);
+                response.statusCode = 500;
+                response.end();
+            });
+        return;
+    };
+    if (request.method === "GET" && request.url.startsWith("/db/themes")) {
+        if (!myURL.query.category) {
+            response.statusCode = 406;
+            response.end(`406 Incorrect parameters`);
+            return;
+        };
+        const category = myURL.query.category;
+        db.query("SELECT title FROM Themes \
+            WHERE IDcategory = (SELECT ID FROM Categories WHERE title = $1);", [category])
+            .then((result) => {
+                if (!result.rows[0]) {
+                    response.statusCode = 404;
+                    response.end(`404 Themes with category: ${category} not found!`);
+                    return;
+                }
+                response.statusCode = 200;
+                response.setHeader("Content-Type", "application/json");
+                const themes = JSON.stringify(result.rows);
+                response.setHeader("Content-Length", Buffer.byteLength(themes));
+                response.end(themes);
+            }).catch((err) => {
+                console.error('Error executing query', err);
+                response.statusCode = 500;
+                response.end();
+            });
+        return;
+    };
+    if (request.method === "GET" && request.url.startsWith("/db/text")) {
         if (!myURL.query.category || !myURL.query.theme) {
             response.statusCode = 406;
             response.end(`406 Incorrect parameters`);
@@ -47,25 +75,29 @@ const server = http.createServer((request, response) => {
         }
         const category = myURL.query.category;
         const theme = myURL.query.theme;
-        const str = fs.readFileSync("texts.json", "utf8");
-        const texts = JSON.parse(str);
-        if (Object.keys(texts).every(key => key !== category)) {
-            response.statusCode = 404;
-            response.end(`404 Text with category: ${category} not found!`);
-            return;
-        }
-        if (Object.keys(texts[category]).every(key => key !== theme)) {
-            response.statusCode = 404;
-            response.end(`404 Text with theme: ${theme} not found!`);
-            return;
-        }
-        const index = Math.trunc(texts[category][theme].length * Math.random());
-        // = index;
-        const text = JSON.stringify(texts[category][theme][index]);
-        response.statusCode = 200;
-        response.setHeader("Content-Type", "application/json");
-        response.setHeader("Content-Length", Buffer.byteLength(text));
-        response.end(text);
+        db.query("SELECT ID, body FROM Texts \
+            WHERE IDtheme = (SELECT ID FROM Themes \
+            WHERE IDcategory = (SELECT ID FROM Categories WHERE title = $1)\
+                AND title = $2);", [category, theme])
+            .then((result) => {
+                if (!result.rows[0]) {
+                    response.statusCode = 404;
+                    response.end(`404 Text with category: ${category}, theme: ${theme} not found!`);
+                    return;
+                }
+                response.statusCode = 200;
+                response.setHeader("Content-Type", "application/json");
+                const index = Math.trunc(result.rows.length * Math.random());
+                // ToDo = result.rows[index].ID;
+                const text = JSON.stringify(result.rows[index]);
+                response.setHeader("Content-Length", Buffer.byteLength(text));
+                response.end(text);
+            }).catch((err) => {
+                console.error('Error executing query', err);
+                response.statusCode = 500;
+                response.end();
+            });
+        return;
     } else if (request.method === "POST" && request.url.startsWith("/db/text")) {
         if (request.headers["content-type"] !== "application/json") {
             request.resume();
