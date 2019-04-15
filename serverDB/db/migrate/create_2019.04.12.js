@@ -1,4 +1,4 @@
-const db = require("../db");
+const db = require("../index.js");
 
 function up() {
     const text = "CREATE TABLE TypesOfUsers (\
