@@ -13,7 +13,7 @@ function up() {
             login VARCHAR(15) NOT NULL UNIQUE,\
             nikname VARCHAR(20),\
             passwordHash VARCHAR(255) NOT NULL,\
-            IDtypeUser integer NOT NULL DEFAULT '2' CONSTRAINT Users_fk0 REFERENCES TypesOfUsers(ID),\
+            IDtypeUser integer NOT NULL DEFAULT 2 CONSTRAINT Users_fk0 REFERENCES TypesOfUsers(ID),\
             email VARCHAR(30) NOT NULL UNIQUE,\
             bestResult DECIMAL,\
             avatar VARCHAR(100),\
@@ -27,7 +27,7 @@ function up() {
         \
         CREATE TABLE Categories (\
             ID serial PRIMARY KEY,\
-            title VARCHAR(30) NOT NULL UNIQUE\
+            category VARCHAR(30) NOT NULL UNIQUE\
         ) WITH (\
           OIDS=FALSE\
         );\
@@ -35,7 +35,7 @@ function up() {
         CREATE TABLE Themes (\
             ID serial PRIMARY KEY,\
             IDcategory integer NOT NULL CONSTRAINT Themes_fk0 REFERENCES Categories(ID),\
-            title VARCHAR(30) NOT NULL UNIQUE\
+            theme VARCHAR(30) NOT NULL UNIQUE\
         ) WITH (\
           OIDS=FALSE\
         );\

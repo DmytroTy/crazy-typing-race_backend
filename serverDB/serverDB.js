@@ -7,9 +7,9 @@ const PORT = process.env.PORT || 3000;
 
 const server = http.createServer((request, response) => {
     const myURL = url.parse(request.url, true); // new URL(request.url, host?);
-    console.log(`request.method: ${request.method}`);
+    /* console.log(`request.method: ${request.method}`);
     console.log(`request.headers.content-type: ${request.headers["content-type"]}`);
-    console.log(`request.headers.origin: ${request.headers["origin"]}`);
+    console.log(`request.headers.origin: ${request.headers["origin"]}`); */
     response.setHeader("Content-Type", "text/plain");
     response.setHeader("Access-Control-Allow-Origin", request.headers["origin"] || "*");
     response.setHeader("Vary", "*");
@@ -26,7 +26,7 @@ const server = http.createServer((request, response) => {
         return;
     };
     if (request.method === "GET" && request.url.startsWith("/db/categories")) {
-        db.query("SELECT title FROM Categories;")
+        db.query("SELECT category FROM Categories;")
             .then((result) => {
                 response.statusCode = 200;
                 response.setHeader("Content-Type", "application/json");
@@ -47,8 +47,8 @@ const server = http.createServer((request, response) => {
             return;
         };
         const category = myURL.query.category;
-        db.query("SELECT title FROM Themes \
-            WHERE IDcategory = (SELECT ID FROM Categories WHERE title = $1);", [category])
+        db.query("SELECT theme FROM Themes \
+            WHERE IDcategory = (SELECT ID FROM Categories WHERE category = $1);", [category])
             .then((result) => {
                 if (!result.rows[0]) {
                     response.statusCode = 404;
@@ -77,8 +77,8 @@ const server = http.createServer((request, response) => {
         const theme = myURL.query.theme;
         db.query("SELECT ID, body FROM Texts \
             WHERE IDtheme = (SELECT ID FROM Themes \
-            WHERE IDcategory = (SELECT ID FROM Categories WHERE title = $1)\
-                AND title = $2);", [category, theme])
+            WHERE IDcategory = (SELECT ID FROM Categories WHERE category = $1)\
+                AND theme = $2);", [category, theme])
             .then((result) => {
                 if (!result.rows[0]) {
                     response.statusCode = 404;
@@ -98,7 +98,80 @@ const server = http.createServer((request, response) => {
                 response.end();
             });
         return;
-    } else if (request.method === "POST" && request.url.startsWith("/db/text")) {
+    };
+    if (request.method === "POST" && request.url.startsWith("/db/category")) {
+        if (request.headers["content-type"] !== "application/json") {
+            request.resume();
+            response.statusCode = 415;
+            response.end(`Expected application/json but received ${request.headers["content-type"]}`);
+            return;
+        }
+        request.setEncoding("utf8");
+        let data = "";
+        request.on("data", chunk => { data += chunk; });
+        request.on("end", () => {
+            let text;
+            try {
+                text = JSON.parse(data);
+            } catch (err) {
+                console.error(err.message);
+            }
+            if (!text || !text.category) {
+                response.statusCode = 406;
+                response.end(`406 Incorrect data recived`);
+                return;
+            }
+            db.query("INSERT INTO Categories(category) VALUES ($1);", [text.category])
+                .then((result) => {
+                    response.statusCode = 204;
+                    response.end();
+                }).catch((err) => {
+                    console.error('Error executing query', err);
+                    response.statusCode = 500;
+                    response.end();
+                });
+            return;
+        });
+    };
+    if (request.method === "POST" && request.url.startsWith("/db/theme")) {
+        if (request.headers["content-type"] !== "application/json") {
+            request.resume();
+            response.statusCode = 415;
+            response.end(`Expected application/json but received ${request.headers["content-type"]}`);
+            return;
+        }
+        request.setEncoding("utf8");
+        let data = "";
+        request.on("data", chunk => { data += chunk; });
+        request.on("end", () => {
+            let text;
+            try {
+                text = JSON.parse(data);
+            } catch (err) {
+                console.error(err.message);
+            }
+            if (!text || !text.category || !text.theme) {
+                response.statusCode = 406;
+                response.end(`406 Incorrect data recived`);
+                return;
+            }
+            db.query("INSERT INTO Themes(IDcategory, theme) \
+                VALUES (\
+                    (SELECT ID FROM Categories WHERE category = $1),\
+                    $2\
+                );", [text.category, text.theme])
+                .then((result) => {
+                    response.statusCode = 204;
+                    response.end();
+                }).catch((err) => {
+                    console.error('Error executing query', err);
+                    response.statusCode = 500;
+                    response.end();
+                });
+            return;
+        });
+    };
+    if (request.method === "POST" && request.url.startsWith("/db/text")) {
         if (request.headers["content-type"] !== "application/json") {
             request.resume();
             response.statusCode = 415;
@@ -120,44 +193,61 @@ const server = http.createServer((request, response) => {
                 response.end(`406 Incorrect data recived`);
                 return;
             }
-            const str = fs.readFileSync("texts.json", "utf8");
-            const texts = JSON.parse(str);
-            if (typeof texts[text.category] !== "object") 
-                texts[text.category] = {};
-
-            if (typeof texts[text.category][text.theme] !== "object") 
-                texts[text.category][text.theme] = [];
-
-            if (texts[text.category][text.theme].some(str => str === text.body)) {
-                response.statusCode = 409;
-                response.end(`409 This text alredy exist in: ${text.category}: ${text.theme}!`);
-                return;
-            }
-            texts[text.category][text.theme].push(text.body);
-            fs.writeFileSync("texts.json", JSON.stringify(texts, null, 1));
-            response.statusCode = 204;
-            response.end();
+            db.query("INSERT INTO Texts(IDtheme, body) \
+                VALUES (\
+                    (SELECT ID FROM Themes \
+                        WHERE IDcategory = (SELECT ID FROM Categories WHERE category = $1)\
+                        AND theme = $2),\
+                    $3\
+                ) RETURNING *;", [text.category, text.theme, text.body])
+                .then((result) => {
+                    /* response.statusCode = 200;
+                    response.setHeader("Content-Type", "application/json");
+                    const text = JSON.stringify(result.rows[0]);
+                    response.setHeader("Content-Length", Buffer.byteLength(text));
+                    response.end(text); */
+                    response.statusCode = 204;
+                    response.end();
+                }).catch((err) => {
+                    console.error('Error executing query', err);
+                    response.statusCode = 500;
+                    response.end();
+                    /* if ()) {
+                        response.statusCode = 409;
+                        response.end(`409 This text alredy exist in: ${text.category}: ${text.theme}!`);
+                        return;
+                    } */
+                });
+            return;
         });
-    } else if (request.method === "GET" && request.url.startsWith("/db/user")) {
+    };
+    if (request.method === "GET" && request.url.startsWith("/db/user")) {
         if (!myURL.query.login) {
             response.statusCode = 406;
             response.end(`406 Incorrect parameters`);
             return;
         }
         const login = myURL.query.login;
-        const str = fs.readFileSync("users.json", "utf8");
-        const users = JSON.parse(str);
-        if (Object.keys(users).every(key => key !== login)) {
-            response.statusCode = 404;
-            response.end(`404 User with login: ${myURL.query.login} not found!`);
-            return;
-        }
-        const user = JSON.stringify(users.login);
-        response.statusCode = 200;
-        response.setHeader("Content-Type", "application/json");
-        response.setHeader("Content-Length", Buffer.byteLength(user));
-        response.end(user);
-    } else if (request.method === "POST" && request.url.startsWith("/db/user")) {
+        db.query("SELECT * FROM Users WHERE login = $1;", [login])
+            .then((result) => {
+                if (!result.rows[0]) {
+                    response.statusCode = 404;
+                    response.end(`404 User with login: ${login} not found!`);
+                    return;
+                }
+                response.statusCode = 200;
+                response.setHeader("Content-Type", "application/json");
+                const user = JSON.stringify(result.rows[0]);
+                response.setHeader("Content-Length", Buffer.byteLength(user));
+                response.end(user);
+            }).catch((err) => {
+                console.error('Error executing query', err);
+                response.statusCode = 500;
+                response.end();
+            });
+        return;
+    };
+    if (request.method === "POST" && request.url.startsWith("/db/user")) {
         if (request.headers["content-type"] !== "application/json") {
             request.resume();
             response.statusCode = 415;
@@ -174,27 +264,31 @@ const server = http.createServer((request, response) => {
             } catch (err) {
                 console.error(err.message);
             }
-            if (!user || !user.login) {
+            if (!user || !user.login || !user.password || !user.email) {
                 response.statusCode = 406;
                 response.end(`406 Incorrect data recived`);
                 return;
             }
-            const str = fs.readFileSync("users.json", "utf8");
-            const users = JSON.parse(str);
-            if (Object.keys(users).some(key => key === user.login)) {
-                response.statusCode = 409;
-                response.end(`409 User with login: ${user.login} alredy exist!`);
-                return;
-            }
-            users[user.login] = user;
-            fs.writeFileSync("users.json", JSON.stringify(users, null, 1));
-            response.statusCode = 204;
-            response.end();
+            db.query("INSERT INTO Users(login, passwordHash, email) VALUES ($1, $2,  $3);",
+                [user.login, user.password, user.email])
+                .then((result) => {
+                    response.statusCode = 204;
+                    response.end();
+                }).catch((err) => {
+                    console.error('Error executing query', err);
+                    response.statusCode = 500;
+                    response.end();
+                    /* if (Object.keys(users).some(key => key === user.login)) {
+                        response.statusCode = 409;
+                        response.end(`409 User with login: ${user.login} alredy exist!`);
+                        return;
+                    } */
+                });
+            return;
         });
-    } else {
-        response.statusCode = 404;
-        response.end("404 Resourse not found!");
     }
+    response.statusCode = 404;
+    response.end("404 Resourse not found!");
 });
 
 server.listen(PORT, "localhost", console.log(`Server starts at port: ${PORT}`));
