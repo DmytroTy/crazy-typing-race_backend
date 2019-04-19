@@ -25,7 +25,7 @@ const server = http.createServer((request, response) => {
         response.end();
         return;
     };
-    if (request.method === "GET" && request.url.startsWith("/db/categories")) {
+    if (request.method === "GET" && request.url.startsWith("/api/v1/categories")) {
         db.query("SELECT category FROM Categories;")
             .then((result) => {
                 response.statusCode = 200;
@@ -40,7 +40,7 @@ const server = http.createServer((request, response) => {
             });
         return;
     };
-    if (request.method === "GET" && request.url.startsWith("/db/themes")) {
+    if (request.method === "GET" && request.url.startsWith("/api/v1/themes")) {
         if (!myURL.query.category) {
             response.statusCode = 406;
             response.end(`406 Incorrect parameters`);
@@ -67,7 +67,7 @@ const server = http.createServer((request, response) => {
             });
         return;
     };
-    if (request.method === "GET" && request.url.startsWith("/db/text")) {
+    if (request.method === "GET" && request.url.startsWith("/api/v1/text")) {
         if (!myURL.query.category || !myURL.query.theme) {
             response.statusCode = 406;
             response.end(`406 Incorrect parameters`);
@@ -99,7 +99,7 @@ const server = http.createServer((request, response) => {
             });
         return;
     };
-    if (request.method === "POST" && request.url.startsWith("/db/category")) {
+    if (request.method === "POST" && request.url.startsWith("/api/v1/category")) {
         if (request.headers["content-type"] !== "application/json") {
             request.resume();
             response.statusCode = 415;
@@ -133,7 +133,7 @@ const server = http.createServer((request, response) => {
             return;
         });
     };
-    if (request.method === "POST" && request.url.startsWith("/db/theme")) {
+    if (request.method === "POST" && request.url.startsWith("/api/v1/theme")) {
         if (request.headers["content-type"] !== "application/json") {
             request.resume();
             response.statusCode = 415;
@@ -171,7 +171,7 @@ const server = http.createServer((request, response) => {
             return;
         });
     };
-    if (request.method === "POST" && request.url.startsWith("/db/text")) {
+    if (request.method === "POST" && request.url.startsWith("/api/v1/text")) {
         if (request.headers["content-type"] !== "application/json") {
             request.resume();
             response.statusCode = 415;
@@ -221,7 +221,7 @@ const server = http.createServer((request, response) => {
             return;
         });
     };
-    if (request.method === "GET" && request.url.startsWith("/db/user")) {
+    if (request.method === "GET" && request.url.startsWith("/api/v1/user")) {
         if (!myURL.query.login) {
             response.statusCode = 406;
             response.end(`406 Incorrect parameters`);
@@ -247,7 +247,7 @@ const server = http.createServer((request, response) => {
             });
         return;
     };
-    if (request.method === "POST" && request.url.startsWith("/db/user")) {
+    if (request.method === "POST" && request.url.startsWith("/api/v1/user")) {
         if (request.headers["content-type"] !== "application/json") {
             request.resume();
             response.statusCode = 415;
