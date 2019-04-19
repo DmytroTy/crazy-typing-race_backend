@@ -4,6 +4,7 @@
   "description": "Crazy Typing Race",
   "main": "index.js",
   "dependencies": {
+    "dotenv": "^7.0.0",
     "pg": "^7.9.0"
   },
   "devDependencies": {},

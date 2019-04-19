@@ -1,6 +1,7 @@
 const http = require("http");
 const url = require("url");
-const fs = require("fs");
+// const fs = require("fs");
+require('dotenv').config();
 const db = require("./db");
 
 const PORT = process.env.PORT || 3000;
