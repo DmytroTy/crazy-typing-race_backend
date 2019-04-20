@@ -39,9 +39,7 @@ const server = http.createServer((request, response) => {
                 response.statusCode = 500;
                 response.end();
             });
-        return;
-    };
-    if (request.method === "GET" && request.url.startsWith("/api/v1/themes")) {
+    } else if (request.method === "GET" && request.url.startsWith("/api/v1/themes")) {
         if (!myURL.query.category) {
             response.statusCode = 406;
             response.end(`406 Incorrect parameters`);
@@ -66,9 +64,7 @@ const server = http.createServer((request, response) => {
                 response.statusCode = 500;
                 response.end();
             });
-        return;
-    };
-    if (request.method === "GET" && request.url.startsWith("/api/v1/text")) {
+    } else if (request.method === "GET" && request.url.startsWith("/api/v1/text")) {
         if (!myURL.query.category || !myURL.query.theme) {
             response.statusCode = 406;
             response.end(`406 Incorrect parameters`);
@@ -98,9 +94,7 @@ const server = http.createServer((request, response) => {
                 response.statusCode = 500;
                 response.end();
             });
-        return;
-    };
-    if (request.method === "POST" && request.url.startsWith("/api/v1/category")) {
+    } else if (request.method === "POST" && request.url.startsWith("/api/v1/category")) {
         if (request.headers["content-type"] !== "application/json") {
             request.resume();
             response.statusCode = 415;
@@ -128,13 +122,16 @@ const server = http.createServer((request, response) => {
                     response.end();
                 }).catch((err) => {
                     console.error('Error executing query', err);
+                    if (err.code === "23505") {
+                        response.statusCode = 409;
+                        response.end(`409 This category: ${text.category} already exist!`);
+                        return;
+                    }
                     response.statusCode = 500;
                     response.end();
                 });
-            return;
         });
-    };
-    if (request.method === "POST" && request.url.startsWith("/api/v1/theme")) {
+    } else if (request.method === "POST" && request.url.startsWith("/api/v1/theme")) {
         if (request.headers["content-type"] !== "application/json") {
             request.resume();
             response.statusCode = 415;
@@ -166,13 +163,21 @@ const server = http.createServer((request, response) => {
                     response.end();
                 }).catch((err) => {
                     console.error('Error executing query', err);
+                    if (err.code === "23505") {
+                        response.statusCode = 409;
+                        response.end(`409 This theme: ${text.theme} already exist in category: ${text.category}!`);
+                        return;
+                    }
+                    if (err.code === "23502") {
+                        response.statusCode = 409;
+                        response.end(`409 Category: ${text.category} not exist`);
+                        return;
+                    }
                     response.statusCode = 500;
                     response.end();
                 });
-            return;
         });
-    };
-    if (request.method === "POST" && request.url.startsWith("/api/v1/text")) {
+    } else if (request.method === "POST" && request.url.startsWith("/api/v1/text")) {
         if (request.headers["content-type"] !== "application/json") {
             request.resume();
             response.statusCode = 415;
@@ -211,18 +216,21 @@ const server = http.createServer((request, response) => {
                     response.end();
                 }).catch((err) => {
                     console.error('Error executing query', err);
+                    if (err.code === "23505") {
+                        response.statusCode = 409;
+                        response.end(`409 This text already exist in: ${text.category}: ${text.theme}!`);
+                        return;
+                    }
+                    if (err.code === "23502") {
+                        response.statusCode = 409;
+                        response.end(`409 Category: ${text.category} or theme: ${text.theme} not exist!`);
+                        return;
+                    }
                     response.statusCode = 500;
                     response.end();
-                    /* if ()) {
-                        response.statusCode = 409;
-                        response.end(`409 This text alredy exist in: ${text.category}: ${text.theme}!`);
-                        return;
-                    } */
                 });
-            return;
         });
-    };
-    if (request.method === "GET" && request.url.startsWith("/api/v1/user")) {
+    } else if (request.method === "GET" && request.url.startsWith("/api/v1/user")) {
         if (!myURL.query.login) {
             response.statusCode = 406;
             response.end(`406 Incorrect parameters`);
@@ -246,9 +254,7 @@ const server = http.createServer((request, response) => {
                 response.statusCode = 500;
                 response.end();
             });
-        return;
-    };
-    if (request.method === "POST" && request.url.startsWith("/api/v1/user")) {
+    } else if (request.method === "POST" && request.url.startsWith("/api/v1/user")) {
         if (request.headers["content-type"] !== "application/json") {
             request.resume();
             response.statusCode = 415;
@@ -281,15 +287,15 @@ const server = http.createServer((request, response) => {
                     response.end();
                     /* if (Object.keys(users).some(key => key === user.login)) {
                         response.statusCode = 409;
-                        response.end(`409 User with login: ${user.login} alredy exist!`);
+                        response.end(`409 User with login: ${user.login} already exist!`);
                         return;
                     } */
                 });
-            return;
         });
+    } else {
+        response.statusCode = 404;
+        response.end("404 Resourse not found!");
     }
-    response.statusCode = 404;
-    response.end("404 Resourse not found!");
 });
 
 server.listen(PORT, "localhost", console.log(`Server starts at port: ${PORT}`));
