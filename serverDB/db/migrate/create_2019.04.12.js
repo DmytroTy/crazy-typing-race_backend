@@ -35,7 +35,8 @@ function up() {
         CREATE TABLE Themes (\
             ID serial PRIMARY KEY,\
             IDcategory integer NOT NULL CONSTRAINT Themes_fk0 REFERENCES Categories(ID),\
-            theme VARCHAR(30) NOT NULL\
+            theme VARCHAR(30) NOT NULL,\
+            CONSTRAINT themes_theme_unk UNIQUE(IDcategory, theme)\
         ) WITH (\
           OIDS=FALSE\
         );\
