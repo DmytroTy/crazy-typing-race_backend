@@ -1,0 +1,1 @@
+web: node serverDB/serverDB.js; node serverDB/db/createDB.js
