@@ -1,1 +1,1 @@
-web: node serverDB/db/createDB.js; node serverDB/serverDB.js
+web: node serverDB/serverDB.js
