@@ -1,11 +1,17 @@
 {
   "name": "crazy-typing-race_backend",
   "version": "1.0.0",
+  "engines": {
+    "node": "10.13.0"
+  },
   "description": "Crazy Typing Race",
-  "main": "index.js",
+  "main": "serverWS/serverWS.js",
   "dependencies": {
+    "bufferutil": "4.0.1",
     "dotenv": "^7.0.0",
-    "pg": "^7.9.0"
+    "pg": "^7.9.0",
+    "utf-8-validate": "5.0.2",
+    "ws": "7.0.0"
   },
   "devDependencies": {},
   "scripts": {
