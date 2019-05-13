@@ -1,1 +1,1 @@
-web: node serverDB/serverDB.js
+web: node serverWS/serverWS.js
