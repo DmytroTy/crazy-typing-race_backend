@@ -17,6 +17,7 @@ const server = http.createServer((request, response) => {
     response.setHeader("Cache-Control", "no-store");
     response.setHeader("Keep-Alive", "timeout=2, max=99");
     response.setHeader("Connection", "Keep-Alive");
+
     if (request.method === "OPTIONS") {
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -26,8 +27,9 @@ const server = http.createServer((request, response) => {
         response.end();
         return;
     };
+
     if (request.method === "GET" && request.url.startsWith("/api/v1/categories")) {
-        db.query("SELECT category FROM Categories;")
+        db.query("SELECT category FROM Categories ORDER BY category;")
             .then((result) => {
                 response.statusCode = 200;
                 response.setHeader("Content-Type", "application/json");
@@ -46,8 +48,9 @@ const server = http.createServer((request, response) => {
             return;
         };
         const category = myURL.query.category;
-        db.query("SELECT theme FROM Themes \
-            WHERE IDcategory = (SELECT ID FROM Categories WHERE category = $1);", [category])
+        db.query("SELECT ID AS IDtheme, theme FROM Themes \
+            WHERE IDcategory = (SELECT ID FROM Categories WHERE category = $1) \
+            ORDER BY theme;", [category])
             .then((result) => {
                 if (!result.rows[0]) {
                     response.statusCode = 404;
@@ -72,7 +75,7 @@ const server = http.createServer((request, response) => {
         }
         const category = myURL.query.category;
         const theme = myURL.query.theme;
-        db.query("SELECT ID, body FROM Texts \
+        db.query("SELECT * FROM Texts \
             WHERE IDtheme = (SELECT ID FROM Themes \
             WHERE IDcategory = (SELECT ID FROM Categories WHERE category = $1)\
                 AND theme = $2);", [category, theme])
@@ -205,13 +208,8 @@ const server = http.createServer((request, response) => {
                         WHERE IDcategory = (SELECT ID FROM Categories WHERE category = $1)\
                         AND theme = $2),\
                     $3\
-                ) RETURNING *;", [text.category, text.theme, text.body])
+                );", [text.category, text.theme, text.body])
                 .then((result) => {
-                    /* response.statusCode = 200;
-                    response.setHeader("Content-Type", "application/json");
-                    const text = JSON.stringify(result.rows[0]);
-                    response.setHeader("Content-Length", Buffer.byteLength(text));
-                    response.end(text); */
                     response.statusCode = 204;
                     response.end();
                 }).catch((err) => {
