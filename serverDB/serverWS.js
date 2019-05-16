@@ -14,7 +14,6 @@ wss.on('connection', (ws) => {
     clients[serial] = ws;
     const res = JSON.stringify({ ID: serial }, null, 1);
     ws.send(res);
-    serial++;
 
     ws.on('close', () => {
         // delete gamers[IDtheme];
