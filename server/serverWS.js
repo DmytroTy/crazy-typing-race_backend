@@ -30,14 +30,19 @@ wss.on('connection', (ws) => {
         } catch (err) {
             console.error(err);
         }
-        
+
         if (obj && obj.game && obj.ID) {
             if (games[obj.ID] && games[obj.ID].readyState === WebSocket.OPEN) {
                 games[obj.ID].send(data);
             }
             return;
         }
-        
+
+        if (obj && obj.disconnect && obj.IDtheme) {
+            delete gamers[obj.IDtheme];
+            return;
+        }
+
         if (obj && obj.connect && obj.IDtheme && obj.ID) {
             const gamer = gamers[obj.IDtheme];
             if (!gamer || gamer.ws.readyState !== WebSocket.OPEN) {
