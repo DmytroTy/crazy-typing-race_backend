@@ -49,22 +49,20 @@ wss.on('connection', (ws) => {
                 gamers[obj.IDtheme] = { ws, ID: obj.ID };
                 const res = JSON.stringify({ wait: true, ID: obj.ID }, null, 1);
                 ws.send(res);
-            } else {
-                games[gamer.ID] = ws;
-                // console.log(games[gamer.ID]);
-                games[obj.ID] = gamer.ws;
-                // console.log(games[obj.ID] === games[gamer.ID]);
-                delete gamers[obj.IDtheme];
-
-                timeout = 10;
-                const intervalID = setInterval(() => {
-                    const res = JSON.stringify({ connected: true, timeout }, null, 1);
-                    ws.send(res); // new Date().toTimeString()
-                    gamer.ws.send(res);
-                    --timeout;
-                    if (timeout < 0) clearInterval(intervalID);
-                }, 1000);
+                return;
             }
+            games[gamer.ID] = ws;
+            games[obj.ID] = gamer.ws;
+            // console.log(games[obj.ID] === games[gamer.ID]);
+            delete gamers[obj.IDtheme];
+            timeout = 10;
+            const intervalID = setInterval(() => {
+                const res = JSON.stringify({ connected: true, timeout }, null, 1);
+                ws.send(res); // new Date().toTimeString()
+                gamer.ws.send(res);
+                --timeout;
+                if (timeout < 0) clearInterval(intervalID);
+            }, 1000);
         }
         /* // Broadcast to everyone else.
         wss.clients.forEach((client) => {
