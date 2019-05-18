@@ -56,7 +56,7 @@ wss.on('connection', (ws) => {
                 // console.log(games[obj.ID] === games[gamer.ID]);
                 delete gamers[obj.IDtheme];
 
-                timeout = 15;
+                timeout = 10;
                 const intervalID = setInterval(() => {
                     const res = JSON.stringify({ connected: true, timeout }, null, 1);
                     ws.send(res); // new Date().toTimeString()
@@ -74,6 +74,3 @@ wss.on('connection', (ws) => {
         }); */
     });
 });
-
-
-
