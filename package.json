@@ -5,7 +5,7 @@
     "node": "10.13.0"
   },
   "description": "Crazy Typing Race",
-  "main": "serverWS/serverWS.js",
+  "main": "server/serverWS.js",
   "dependencies": {
     "bufferutil": "4.0.1",
     "dotenv": "^7.0.0",
@@ -16,7 +16,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node serverDB/serverDB.js"
+    "start": "node server/serverWS.js"
   },
   "repository": {
     "type": "git",
