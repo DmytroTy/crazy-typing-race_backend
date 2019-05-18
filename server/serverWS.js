@@ -21,7 +21,7 @@ wss.on('connection', (ws) => {
         // delete games[ws.toString()];
     });
 
-    let timeout = 15;
+    let timeout = 10;
 
     ws.on('message', (data) => {
         let obj;
