@@ -33,7 +33,7 @@ exports.create = (response, obj) => {
             $3\
         );", [obj.category, obj.theme, obj.body])
         .then((result) => {
-            response.statusCode = 204;
+            response.statusCode = 201;
             response.end();
         }).catch((err) => {
             console.error('Error executing query', err);

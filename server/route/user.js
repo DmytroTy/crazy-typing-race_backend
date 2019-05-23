@@ -24,7 +24,7 @@ exports.create = (response, user) => {
     db.query("INSERT INTO Users(login, passwordHash, email) VALUES ($1, $2,  $3);",
         [user.login, user.password, user.email])
         .then((result) => {
-            response.statusCode = 204;
+            response.statusCode = 201;
             response.end();
         }).catch((err) => {
             console.error('Error executing query', err);

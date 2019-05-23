@@ -18,7 +18,7 @@ exports.read = response => {
 exports.create = (response, obj) => {
     db.query("INSERT INTO Categories(category) VALUES ($1);", [obj.category])
         .then((result) => {
-            response.statusCode = 204;
+            response.statusCode = 201;
             response.end();
         }).catch((err) => {
             console.error('Error executing query', err);
