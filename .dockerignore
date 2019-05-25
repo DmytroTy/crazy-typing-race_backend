@@ -1,0 +1,17 @@
+node_modules
+dist
+npm-debug.log*
+.idea
+.DS_Store
+.vscode
+.env
+.env.example
+.db
+.editorconfig
+.gitignore
+.git
+.prettierrc
+Dockerfile
+Docker-compose*
+.eslintrc
+.dockerignore

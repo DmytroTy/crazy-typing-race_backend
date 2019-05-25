@@ -1,0 +1,20 @@
+version: "3.7"
+
+services:
+  app:
+    build: .
+    depends_on:
+      - postgres
+    restart: always
+    ports:
+      - 3000:3000
+    env_file: 
+      - .env
+
+  postgres:
+    image: postgres:11-alpine
+    env_file: 
+      - .env
+    volumes:
+      - ./.db/pgdata:/var/lib/postgresql/data
+      - ./server/db/migrate/init-sql:/docker-entrypoint-initdb.d
