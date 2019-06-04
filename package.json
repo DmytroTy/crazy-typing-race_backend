@@ -2,7 +2,7 @@
   "name": "crazy-typing-race_backend",
   "version": "1.0.0",
   "engines": {
-    "node": "10.13.0"
+    "node": "10.16.0"
   },
   "description": "Crazy Typing Race",
   "main": "server/serverWS.js",
