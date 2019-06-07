@@ -1,33 +1,38 @@
 const db = require("../db");
 
-exports.read = response => {
+exports.read = (ctx, next) => {
     db.query("SELECT category FROM Categories ORDER BY category;")
         .then((result) => {
-            response.statusCode = 200;
-            response.setHeader("Content-Type", "application/json");
+            ctx.status = 200;
+            // ctx.set("Content-Type", "application/json");
             const categories = JSON.stringify(result.rows);
-            response.setHeader("Content-Length", Buffer.byteLength(categories));
-            response.end(categories);
+            ctx.body = categories;
         }).catch((err) => {
             console.error('Error executing query', err);
-            response.statusCode = 500;
-            response.end();
+            ctx.status = 500;
+            ctx.body = null;
         });
 }
 
-exports.create = (response, obj) => {
+exports.create = (ctx, next) => {
+    obj = ctx.request.body;
+    if (!obj || !obj.category) {
+        ctx.status = 406;
+        ctx.body = "406 Incorrect data recived";
+        return;
+    }
     db.query("INSERT INTO Categories(category) VALUES ($1);", [obj.category])
-        .then((result) => {
-            response.statusCode = 201;
-            response.end();
+        .then(() => {
+            ctx.status = 201;
+            ctx.body = null;
         }).catch((err) => {
             console.error('Error executing query', err);
             if (err.code === "23505") {
-                response.statusCode = 409;
-                response.end(`409 This category: ${obj.category} already exist!`);
+                ctx.status = 409;
+                ctx.body = `409 This category: ${obj.category} already exist!`;
                 return;
             }
-            response.statusCode = 500;
-            response.end();
+            ctx.status = 500;
+            ctx.body = null;
         });
 }
