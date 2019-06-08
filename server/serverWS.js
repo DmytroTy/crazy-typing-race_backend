@@ -1,8 +1,8 @@
 const WebSocket = require('ws');
 
-const app = require("./serverDB");
+const server = require("./serverDB");
 
-const wss = new WebSocket.Server({ app });
+const wss = new WebSocket.Server({ server });
 
 const clients = {};
 const gamers = {};
