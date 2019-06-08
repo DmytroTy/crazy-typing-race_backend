@@ -36,7 +36,7 @@ router.post("/api/v1/user", route.user.create);
 
 app.use(router.routes());
 app.use(router.allowedMethods());
-app.listen(PORT);
+app.listen(PORT, "localhost", console.log(`Server starts at port: ${PORT}`));
 
 process.on("uncaughtException", err => { console.error(err); });
 
