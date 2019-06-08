@@ -12,6 +12,7 @@ const app = new Koa();
 app.use(bodyParser());
 
 app.use(async (ctx, next) => {
+    ctx.set("Access-Control-Allow-Origin", ctx.header["origin"] || "*");
     // ctx.set("Vary", "*");
     // ctx.set("Cache-Control", "no-store");
     if (ctx.method === "POST" && ctx.header["content-type"] !== "application/json") {
