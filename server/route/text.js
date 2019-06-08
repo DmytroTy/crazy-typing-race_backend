@@ -15,8 +15,8 @@ exports.read = async (ctx, next) => {
                 AND theme = $2);", [category, theme]);
     } catch (err) {
         console.error('Error executing query', err);
-        ctx.status = 500;
         ctx.body = null;
+        ctx.status = 500;
         return;
     }
     if (!result.rows[0]) {
@@ -56,10 +56,10 @@ exports.create = async (ctx, next) => {
             ctx.body = `409 Category: ${obj.category} or theme: ${obj.theme} not exist!`;
             return;
         }
-        ctx.status = 500;
         ctx.body = null;
+        ctx.status = 500;
         return;
     }
-    ctx.status = 201;
     ctx.body = null;
+    ctx.status = 201;
 }

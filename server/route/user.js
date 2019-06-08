@@ -12,8 +12,8 @@ exports.read = async (ctx, next) => {
         result = await db.query("SELECT * FROM Users WHERE login = $1;", [login]);
     } catch (err) {
         console.error('Error executing query', err);
-        ctx.status = 500;
         ctx.body = null;
+        ctx.status = 500;
         return;
     }
     if (!result.rows[0]) {
@@ -42,10 +42,10 @@ exports.create = async (ctx, next) => {
             ctx.body = `409 User with login: ${user.login}, or e-mail: ${user.email} already exist!`;
             return;
         }
-        ctx.status = 500;
         ctx.body = null;
+        ctx.status = 500;
         return;
     }
-    ctx.status = 201;
     ctx.body = null;
+    ctx.status = 201;
 }

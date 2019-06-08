@@ -6,8 +6,8 @@ exports.read = async (ctx, next) => {
         result = await db.query("SELECT category FROM Categories ORDER BY category;");
     } catch (err) {
         console.error('Error executing query', err);
-        ctx.status = 500;
         ctx.body = null;
+        ctx.status = 500;
         return;
     }
     ctx.status = 200;
@@ -32,10 +32,10 @@ exports.create = async (ctx, next) => {
             ctx.body = `409 This category: ${obj.category} already exist!`;
             return;
         }
-        ctx.status = 500;
         ctx.body = null;
+        ctx.status = 500;
         return;
     }
-    ctx.status = 201;
     ctx.body = null;
+    ctx.status = 201;
 }
