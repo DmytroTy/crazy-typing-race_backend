@@ -1,5 +1,3 @@
-// const http = require("http");
-// const url = require("url");
 // const fs = require("fs");
 const Koa = require("koa");
 const Router = require("koa-router");
@@ -13,14 +11,16 @@ const PORT = process.env.PORT || 3000;
 const app = new Koa();
 app.use(bodyParser());
 
-app.use((ctx, next) => {
+app.use(async (ctx, next) => {
+    // ctx.set("Vary", "*");
+    // ctx.set("Cache-Control", "no-store");
     if (ctx.method === "POST" && ctx.header["content-type"] !== "application/json") {
         // request.resume();
         ctx.status = 415;
         ctx.body = `Expected application/json but received ${ctx.header["content-type"]}`;
         return;
     }
-    next();
+    await next();
 });
 
 const router = new Router();
